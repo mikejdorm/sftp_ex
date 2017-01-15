@@ -5,8 +5,6 @@ defmodule SftpEx.Mixfile do
     [app: :sftp_ex,
      version: "0.2.0",
      elixir: "~> 1.3",
-#     build_embedded: Mix.env == :prod,
-#     start_permanent: Mix.env == :prod,
      deps: deps(),
      description: "A simple SFTP Elixir library",
      package: package()
