@@ -1,0 +1,2 @@
+%{"meck": {:hex, :meck, "0.8.4", "59ca1cd971372aa223138efcf9b29475bde299e1953046a0c727184790ab1520", [:make, :rebar], []},
+  "mock": {:hex, :mock, "0.2.0", "5991877be6bb514b647dbd6f4869bc12bd7f2829df16e86c98d6108f966d34d7", [:mix], [{:meck, "~> 0.8.2", [hex: :meck, optional: false]}]}}

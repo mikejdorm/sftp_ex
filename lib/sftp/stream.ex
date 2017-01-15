@@ -1,66 +1,69 @@
 defmodule SFTP.Stream do
-  require Logger
   @moduledoc "
   A stream to download/upload a file from a server through SFTP
   "
+  alias SFTP.AccessService, as: AccessSvc
+  alias SFTP.TransferService, as: TransferSvc
 
-  defstruct channel_pid: nil, path: nil, modes: [], byte_length: 32768
+  defstruct connection: nil, path: nil, byte_length: 32768
 
   @type t :: %__MODULE__{}
 
   @doc false
-  def __build__(channel_pid, path, modes, byte_length) do
-    %SFTP.Stream{channel_pid: channel_pid, path: path, modes: modes, byte_length: byte_length}
+  def __build__(connection, path, byte_length) do
+    %SFTP.Stream{connection: connection, path: path, byte_length: byte_length}
   end
 
   defimpl Collectable do
-    def into(%{channel_pid: channel_pid, path: path, modes: modes} = stream) do
-      modes = for mode <- modes, not mode in [:read], do: mode
-      case SFTP.Service.open(channel_pid, path, [:write]) do
-        {:ok, handle} ->
-          {:ok, into(channel_pid, handle, path, stream)}
-        {:error, reason} ->
-          raise File.Error, reason: reason, action: "stream", path: path
+    def into(%{connection: connection, path: path, byte_length: byte_length} = stream) do
+      case AccessSvc.open(connection, path, :write) do
+        {:error, reason} -> {:error, reason}
+        {:ok, handle} -> {:ok, into(connection, handle, path, stream)}
       end
     end
 
-    defp into(channel_pid, handle, path, stream) do
+    defp into(connection, handle, path, stream) do
       fn
-        :ok, {:cont, x} -> SFTP.Service.write(channel_pid, handle, x)
+        :ok, {:cont, x} -> TransferSvc.write(connection, handle, x)
         :ok, :done ->
-          :ok = SFTP.Service.close(channel_pid, handle, path)
+          :ok = AccessSvc.close(connection, handle, path)
           stream
         :ok, :halt ->
-          :ok =  SFTP.Service.close(channel_pid, handle, path)
+          :ok = AccessSvc.close(connection, handle, path)
         {:error, :closed} , {:cont, x} ->
-           :ok = SFTP.Service.close(channel_pid, handle, path)
+           :ok = AccessSvc.close(connection, handle, path)
         :error, :done ->
-           :ok = SFTP.Service.close(channel_pid, handle, path)
+           :ok = AccessSvc.close(connection, handle, path)
         :error, :halt ->
-             :ok =  SFTP.Service.close(channel_pid, handle, path)
+             :ok = AccessSvc.close(connection, handle, path)
       end
     end
   end
 
   defimpl Enumerable do
-
-        def reduce(%{channel_pid: channel_pid, path: path, byte_length: byte_length}, acc, fun) do
-
+        def reduce(%{connection: connection, path: path, byte_length: byte_length}, acc, fun) do
           start_function =
             fn ->
-               case SFTP.Service.open(channel_pid, path, [:read]) do
-                  {:ok, handle} -> handle
+               case AccessSvc.open(connection, path, [:read]) do
                   {:error, reason} ->
                       raise File.Error, reason: reason, action: "stream", path: path
+                   handle -> handle
                end
              end
 
-          next_function = &SFTP.Service.each_binstream(channel_pid, &1, byte_length)
+          next_function = &TransferSvc.each_binstream(connection, &1, byte_length)
 
-          close_function = &SFTP.Service.close(channel_pid, &1, path)
+          close_function = &AccessSvc.close(connection, &1, path)
 
           Stream.resource(start_function, next_function, close_function).(acc, fun)
         end
-  end
 
+        def count(_stream) do
+          {:error, __MODULE__}
+        end
+
+        def member?(_stream, _term) do
+          {:error, __MODULE__}
+        end
+  end
 end
