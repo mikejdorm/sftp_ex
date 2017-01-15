@@ -45,9 +45,8 @@ defmodule SFTP.Stream do
           start_function =
             fn ->
                case AccessSvc.open(connection, path, [:read]) do
-                  {:error, reason} ->
-                      raise File.Error, reason: reason, action: "stream", path: path
-                   handle -> handle
+                  {:error, reason} -> raise File.Error, reason: reason, action: "stream", path: path
+                   {:ok, handle} -> handle
                end
              end
 

@@ -30,34 +30,24 @@ defmodule SFTP.AccessService do
     Opens a file given a channel PID and path.
     {:ok, handle}, or {:error, reason}
   """
-  def open(connection, path, mode \\ :read) do
-    cond do
-      Enum.member?([:read , :write, :trunc , :append , :binary], mode) ->
-        open_file_or_directory(connection, path, mode)
-      Enum.member?([:creat], mode) ->
-        create_file(connection, path)
-       true -> {:error, "Incorrect mode: #{inspect mode} used."}
-     end
-  end
-
-  def open_file(connection, remote_path, mode) do
-    @sftp.open(connection, remote_path, [mode])
-  end
-
-  def open_dir(connection, remote_path) do
-    case @sftp.open_directory(connection, remote_path) do
-      {:ok, handle} -> {:ok, handle}
-      e -> S.handle_error(e)
-    end
-  end
-
-  defp open_file_or_directory(connection, path, mode) do
+  def open(connection, path, mode) do
     case file_info(connection, path) do
       {:ok, info} ->   case info.type do
                                 :directory -> open_dir(connection, path)
                                 _ -> open_file(connection, path, mode)
                         end
        e -> S.handle_error(e)
+    end
+  end
+
+  def open_file(connection, remote_path, mode) do
+    @sftp.open(connection, remote_path, mode)
+  end
+
+  def open_dir(connection, remote_path) do
+    case @sftp.open_directory(connection, remote_path) do
+      {:ok, handle} -> {:ok, handle}
+      e -> S.handle_error(e)
     end
   end
 
