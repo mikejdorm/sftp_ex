@@ -16,26 +16,20 @@ defmodule SFTP.Stream do
 
   defimpl Collectable do
     def into(%{connection: connection, path: path, byte_length: byte_length} = stream) do
-      case AccessSvc.open(connection, path, :write) do
+      case AccessSvc.open(connection, path, [:write, :binary, :creat]) do
         {:error, reason} -> {:error, reason}
-        {:ok, handle} -> {:ok, into(connection, handle, path, stream)}
+        {:ok, handle} -> {:ok, into(connection, handle, stream)}
       end
     end
 
-    defp into(connection, handle, path, stream) do
+    defp into(connection, handle, stream) do
       fn
         :ok, {:cont, x} -> TransferSvc.write(connection, handle, x)
         :ok, :done ->
-          :ok = AccessSvc.close(connection, handle, path)
+          :ok = AccessSvc.close(connection, handle)
           stream
         :ok, :halt ->
-          :ok = AccessSvc.close(connection, handle, path)
-        {:error, :closed} , {:cont, x} ->
-           :ok = AccessSvc.close(connection, handle, path)
-        :error, :done ->
-           :ok = AccessSvc.close(connection, handle, path)
-        :error, :halt ->
-             :ok = AccessSvc.close(connection, handle, path)
+          :ok = AccessSvc.close(connection, handle)
       end
     end
   end
@@ -44,7 +38,7 @@ defmodule SFTP.Stream do
         def reduce(%{connection: connection, path: path, byte_length: byte_length}, acc, fun) do
           start_function =
             fn ->
-               case AccessSvc.open(connection, path, [:read]) do
+               case AccessSvc.open(connection, path, [:read, :binary]) do
                   {:error, reason} -> raise File.Error, reason: reason, action: "stream", path: path
                    {:ok, handle} -> handle
                end
@@ -52,7 +46,7 @@ defmodule SFTP.Stream do
 
           next_function = &TransferSvc.each_binstream(connection, &1, byte_length)
 
-          close_function = &AccessSvc.close(connection, &1, path)
+          close_function = &AccessSvc.close(connection, &1)
 
           Stream.resource(start_function, next_function, close_function).(acc, fun)
         end

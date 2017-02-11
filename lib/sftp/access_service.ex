@@ -3,7 +3,7 @@ require Logger
 defmodule SFTP.AccessService do
   @moduledoc "Functions for accessing files and directories"
 
-  @sftp Application.get_env(:sftp_ex, :sftp_service)
+  @sftp Application.get_env(:sftp_ex, :sftp_service, SFTP.Service)
 
   @doc """
   Closes an open file

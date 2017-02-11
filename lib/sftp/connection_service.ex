@@ -4,8 +4,8 @@ defmodule SFTP.ConnectionService do
   @moduledoc """
     Provides methods related to starting and stopping an SFTP connection
   """
-  @ssh Application.get_env(:sftp_ex, :ssh_service)
-  @sftp Application.get_env(:sftp_ex, :sftp_service)
+  @ssh Application.get_env(:sftp_ex, :ssh_service, SSH.Service)
+  @sftp Application.get_env(:sftp_ex, :sftp_service, SFTP.Service)
 
   @doc """
   Stops a SFTP channel and closes the SSH connection.
