@@ -4,7 +4,7 @@ defmodule SFTP.TransferService do
   @moduledoc """
   Provides data transfer related functions
   """
-  @sftp Application.get_env(:sftp_ex, :sftp_service)
+  @sftp Application.get_env(:sftp_ex, :sftp_service, SFTP.Service)
 
   @doc """
   Similar to IO.each_binstream this returns a tuple with the data
@@ -18,8 +18,7 @@ defmodule SFTP.TransferService do
         {:halt, handle}
       {:error, reason} ->
         raise IO.StreamError, reason: reason
-      data ->
-        {[data], handle}
+      {:ok, data} -> {[data], handle}
     end
   end
 

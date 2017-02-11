@@ -4,7 +4,7 @@ defmodule SFTP.ManagementService do
   @moduledoc """
   Provides methods for managing files through an SFTP connection
   """
-  @sftp Application.get_env(:sftp_ex, :sftp_service)
+  @sftp Application.get_env(:sftp_ex, :sftp_service, SFTP.Service)
   alias SFTP.AccessService
 
   def make_directory(connection, remote_path) do

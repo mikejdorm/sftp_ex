@@ -3,7 +3,16 @@
 An Elixir wrapper around the Erlang SFTP application. This allows for the use of Elixir Streams to 
 transfer files via SFTP. 
  
-Example usage: 
+## Creating a Connection
+
+The following is an example of creating a connection with a username and password. 
+
+    {:ok, conn} = SftpEx.connect([host: 'somehost', user: 'someuser', password: 'somepassword'])
+
+Other connection arguments can be found in the [Erlang documentation]("http://erlang.org/doc/man/ssh.html#connect-3") 
+
+
+## Streaming Files
 
 An example of writing a file to a server is the following.
     
@@ -15,6 +24,10 @@ A file can be downloaded as follows - in this example a remote file "test2.csv" 
 the local file "filename.txt" 
 
     SftpEx.stream!(connection,"test2.csv") |> Stream.into(File.stream!("filename.txt")) |> Stream.run
+
+or using Enum.into
+
+    SftpEx.stream!(connection, "test2.csv") |> Enum.into(File.stream!("filename.txt"))
     
 This follows the same pattern as Elixir IO streams so a file can be transferred
 from one server to another via SFTP as follows.
@@ -31,7 +44,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:sftp_ex, "~> 0.2.0"}]
+      [{:sftp_ex, "~> 0.2.1"}]
     end
     ```
 
