@@ -33,7 +33,7 @@ defmodule SftpEx do
     Returns :ok, or {:error, reason}
   """
   def upload(connection, remote_path, file_handle) do
-    TransferService.upload(connection.channel_pid, remote_path, file_handle)
+    TransferService.upload(connection, remote_path, file_handle)
   end
 
   @doc """
