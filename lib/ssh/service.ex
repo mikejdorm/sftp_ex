@@ -7,7 +7,7 @@ defmodule SSH.Service do
 
   def start do
       case  :ssh.start do
-       {:ok} -> Logger.info "Connected"
+       :ok -> Logger.info "Connected"
        e -> S.handle_error(e)
        end
   end
