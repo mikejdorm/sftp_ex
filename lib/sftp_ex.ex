@@ -65,8 +65,7 @@ defmodule SftpEx do
     Returns {:ok, Connection}, or {:error, reason}
   """
   def connect(opts) do
-      opts = opts |> Keyword.merge(@default_opts)
-                  |> Keyword.merge(logging_functions())
+     opts = opts |> Keyword.merge(@default_opts)
      own_keys = [:host, :port]
      ssh_opts = opts |> Enum.filter(fn({k,_})-> not (k in own_keys) end)
      ConnectionService.connect(opts[:host], opts[:port], ssh_opts)
