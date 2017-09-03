@@ -15,9 +15,7 @@ defmodule SftpEx do
   def logging_functions do
     [disconnectfun: &SftpEx.Helpers.log_disconnect_func/1,
      unexpectedfun: &SftpEx.Helpers.log_unexpected_func/2,
-     ssh_msg_debug_fun: &SftpEx.Helpers.ssh_msg_debug_fun/4,
-     failfun: &SftpEx.Helpers.log_ssh_fail_func/3,
-     connectfun: &SftpEx.Helpers.connect_log_func/3]
+     ssh_msg_debug_fun: &SftpEx.Helpers.ssh_msg_debug_fun/4]
   end
 
   @doc """
