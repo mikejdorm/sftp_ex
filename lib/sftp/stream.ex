@@ -16,7 +16,7 @@ defmodule SFTP.Stream do
 
   defimpl Collectable do
     def into(%{connection: connection, path: path, byte_length: byte_length} = stream) do
-      case AccessSvc.open(connection, path, [:write, :binary, :creat]) do
+      case AccessSvc.open_file(connection, path, [:write, :binary, :creat]) do
         {:error, reason} -> {:error, reason}
         {:ok, handle} -> {:ok, into(connection, handle, stream)}
       end
