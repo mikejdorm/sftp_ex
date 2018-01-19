@@ -13,8 +13,8 @@ defmodule SFTP.ConnectionService do
   Returns :ok
   """
   def disconnect(connection) do
-      @sftp.stop_channel(connection)
-      @ssh.close_connection(connection)
+    @sftp.stop_channel(connection)
+    @ssh.close_connection(connection)
   end
 
   @doc """
@@ -23,9 +23,13 @@ defmodule SFTP.ConnectionService do
   """
   def connect(host, port, opts) do
     @ssh.start()
-    case  @sftp.start_channel(host, port, opts) do
-      {:ok, channel_pid, connection_ref} -> {:ok, SFTP.Connection.__build__(channel_pid, connection_ref, host, port, opts)}
-      e -> S.handle_error(e)
+
+    case @sftp.start_channel(host, port, opts) do
+      {:ok, channel_pid, connection_ref} ->
+        {:ok, SFTP.Connection.__build__(channel_pid, connection_ref, host, port, opts)}
+
+      e ->
+        S.handle_error(e)
     end
   end
 end

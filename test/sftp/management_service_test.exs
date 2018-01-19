@@ -6,7 +6,7 @@ defmodule SFTP.ManagementServiceTest do
   @host "testhost"
   @port 22
   @opts []
-  @test_connection SFTP.Connection.__build__(self(), self(), @host , @port, @opts)
+  @test_connection SFTP.Connection.__build__(self(), self(), @host, @port, @opts)
 
   test "make directory" do
     assert :ok == ManagementService.make_directory(@test_connection, "test/data")
@@ -17,7 +17,8 @@ defmodule SFTP.ManagementServiceTest do
   end
 
   test "remove non-existent directory" do
-    assert {:error, "Error deleting directory"} == ManagementService.remove_directory(@test_connection, "baddir")
+    assert {:error, "Error deleting directory"} ==
+             ManagementService.remove_directory(@test_connection, "baddir")
   end
 
   test "remove file" do
@@ -25,14 +26,21 @@ defmodule SFTP.ManagementServiceTest do
   end
 
   test "remove non-existent file" do
-    assert {:error, "Error deleting file"} == ManagementService.remove_file(@test_connection, "bad-file.txt")
+    assert {:error, "Error deleting file"} ==
+             ManagementService.remove_file(@test_connection, "bad-file.txt")
   end
 
   test "rename directory" do
-    assert :ok == ManagementService.rename(@test_connection, "test/data/test_file.txt","test/data/test_file2.txt")
+    assert :ok ==
+             ManagementService.rename(
+               @test_connection,
+               "test/data/test_file.txt",
+               "test/data/test_file2.txt"
+             )
   end
 
   test "rename non-existent directory" do
-    assert {:error, "File not found"} == ManagementService.rename(@test_connection, "bad-file.txt","bad-file2.txt")
+    assert {:error, "File not found"} ==
+             ManagementService.rename(@test_connection, "bad-file.txt", "bad-file2.txt")
   end
 end
