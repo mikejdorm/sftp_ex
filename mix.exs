@@ -4,7 +4,7 @@ defmodule SftpEx.Mixfile do
   def project do
     [
       app: :sftp_ex,
-      version: "0.2.5",
+      version: "0.2.6",
       elixir: ">= 1.3.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
