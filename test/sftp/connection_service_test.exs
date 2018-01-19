@@ -6,7 +6,7 @@ defmodule SFTP.ConnectionServiceTest do
   @host "testhost"
   @port 22
   @opts []
-  @test_connection SFTP.Connection.__build__(self(), self(), @host , @port, @opts)
+  @test_connection SFTP.Connection.__build__(self(), self(), @host, @port, @opts)
 
   test "disconnect" do
     assert :ok == ConnectionService.disconnect(@test_connection)

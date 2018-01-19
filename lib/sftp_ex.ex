@@ -7,18 +7,12 @@ defmodule SftpEx do
   alias SFTP.ConnectionService
   alias SFTP.AccessService
 
-  @default_opts  [user_interaction: false,
-                  silently_accept_hosts: true,
-                  rekey_limit: 1000000000000,
-                  port: 22]
-
-  def logging_functions do
-    [disconnectfun: &SftpEx.Helpers.log_disconnect_func/1,
-     unexpectedfun: &SftpEx.Helpers.log_unexpected_func/2,
-     ssh_msg_debug_fun: &SftpEx.Helpers.ssh_msg_debug_fun/4,
-     failfun: &SftpEx.Helpers.log_ssh_fail_func/3,
-     connectfun: &SftpEx.Helpers.connect_log_func/3]
-  end
+  @default_opts [
+    user_interaction: false,
+    silently_accept_hosts: true,
+    rekey_limit: 1_000_000_000_000,
+    port: 22
+  ]
 
   @doc """
     Download a file given the connection and remote_path
@@ -65,11 +59,10 @@ defmodule SftpEx do
     Returns {:ok, Connection}, or {:error, reason}
   """
   def connect(opts) do
-      opts = opts |> Keyword.merge(@default_opts)
-                  |> Keyword.merge(logging_functions())
-     own_keys = [:host, :port]
-     ssh_opts = opts |> Enum.filter(fn({k,_})-> not (k in own_keys) end)
-     ConnectionService.connect(opts[:host], opts[:port], ssh_opts)
+    opts = opts |> Keyword.merge(@default_opts)
+    own_keys = [:host, :port]
+    ssh_opts = opts |> Enum.filter(fn {k, _} -> k not in own_keys end)
+    ConnectionService.connect(opts[:host], opts[:port], ssh_opts)
   end
 
   @doc """
@@ -98,7 +91,7 @@ defmodule SftpEx do
     Returns SFTP.Stream
   """
   def stream!(connection, remote_path, byte_size \\ 32768) do
-       SFTP.Stream.__build__(connection, remote_path,  byte_size)
+    SFTP.Stream.__build__(connection, remote_path, byte_size)
   end
 
   @doc """
@@ -141,7 +134,6 @@ defmodule SftpEx do
     ManagementService.make_directory(connection, remote_path)
   end
 
-
   @doc """
    Types:
      connection = Connection
@@ -163,7 +155,7 @@ defmodule SftpEx do
   def size(connection, remote_path) do
     case AccessService.file_info(connection, remote_path) do
       {:error, reason} -> {:error, reason}
-      {:ok, info}-> info.size
+      {:ok, info} -> info.size
     end
   end
 
@@ -231,7 +223,7 @@ defmodule SftpEx do
     Returns {:ok, handle}, or {:error, reason}
   """
   def rename(connection, old_name, new_name) do
-      ManagementService.rename(connection, old_name, new_name)
+    ManagementService.rename(connection, old_name, new_name)
   end
 end
 
@@ -241,28 +233,7 @@ defmodule SftpEx.Helpers do
   @moduledoc false
 
   def handle_error(e) do
-    Logger.error "#{inspect e}"
+    Logger.error("#{inspect(e)}")
     e
-  end
-
-  def log_disconnect_func(reason) do
-     Logger.debug "Disconnection occurred due to reason: #{inspect reason}"
-  end
-
-  def log_unexpected_func(message, peer) do
-     Logger.debug "Unexpected event occurred for peer #{inspect peer} with message: #{inspect message}"
-     :report
-  end
-
-  def log_ssh_fail_func(user, peer, reason) do
-     Logger.debug "Unexpected event occurred for peer #{inspect peer} and #{inspect user} with message: #{inspect reason}"
-  end
-
-  def connect_log_func(user, peer, method) do
-     Logger.debug "Unexpected event occurred for peer #{inspect peer} and user #{inspect user} with message: #{inspect method}"
-  end
-
-  def ssh_msg_debug_fun(connection_ref, always_display, msg, language_tag) do
-     Logger.debug "SSH Debug Message from connection: #{inspect connection_ref} with message: #{inspect msg}, always display #{inspect always_display}, language tag: #{inspect language_tag}"
   end
 end

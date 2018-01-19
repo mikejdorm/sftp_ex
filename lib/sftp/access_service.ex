@@ -1,5 +1,6 @@
 require SftpEx.Helpers, as: S
 require Logger
+
 defmodule SFTP.AccessService do
   @moduledoc "Functions for accessing files and directories"
 
@@ -10,10 +11,10 @@ defmodule SFTP.AccessService do
   Returns :ok, or {:error, reason}
   """
   def close(connection, handle, _path \\ '') do
-     case @sftp.close(connection, handle) do
-         :ok -> :ok
-         e -> S.handle_error(e)
-     end
+    case @sftp.close(connection, handle) do
+      :ok -> :ok
+      e -> S.handle_error(e)
+    end
   end
 
   @doc """
@@ -22,7 +23,7 @@ defmodule SFTP.AccessService do
   def file_info(connection, remote_path) do
     case @sftp.read_file_info(connection, remote_path) do
       {:ok, file_info} -> {:ok, File.Stat.from_record(file_info)}
-       e -> S.handle_error(e)
+      e -> S.handle_error(e)
     end
   end
 
@@ -32,11 +33,14 @@ defmodule SFTP.AccessService do
   """
   def open(connection, path, mode) do
     case file_info(connection, path) do
-      {:ok, info} ->   case info.type do
-                                :directory -> open_dir(connection, path)
-                                _ -> open_file(connection, path, mode)
-                        end
-       e -> S.handle_error(e)
+      {:ok, info} ->
+        case info.type do
+          :directory -> open_dir(connection, path)
+          _ -> open_file(connection, path, mode)
+        end
+
+      e ->
+        S.handle_error(e)
     end
   end
 

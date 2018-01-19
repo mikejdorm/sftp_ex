@@ -1,5 +1,6 @@
 require SftpEx.Helpers, as: S
 require Logger
+
 defmodule SFTP.ManagementService do
   @moduledoc """
   Provides methods for managing files through an SFTP connection
@@ -27,6 +28,7 @@ defmodule SFTP.ManagementService do
   """
   def remove_directory(connection, directory) do
     remove_all_files(connection, directory)
+
     case @sftp.delete_directory(connection, directory) do
       :ok -> :ok
       {:error, reason} -> {:error, reason}
@@ -52,17 +54,25 @@ defmodule SFTP.ManagementService do
   Lists files in a directory
   """
   def list_files(connection, remote_path) do
-      case AccessService.file_info(connection, remote_path) do
-        {:ok, file_info} -> case file_info.type do
-          :directory -> case @sftp.list_dir(connection, remote_path) do
-            {:ok, file_list} -> Enum.filter(file_list,
-              fn(file_name) -> file_name != '.' && file_name != '..' end)
-             e -> S.handle_error(e)
-           end
-           _ -> {:error, "Remote path is not a directory"}
-         end
-         e -> S.handle_error(e)
-      end
+    case AccessService.file_info(connection, remote_path) do
+      {:ok, file_info} ->
+        case file_info.type do
+          :directory ->
+            case @sftp.list_dir(connection, remote_path) do
+              {:ok, file_list} ->
+                Enum.filter(file_list, fn file_name -> file_name != '.' && file_name != '..' end)
+
+              e ->
+                S.handle_error(e)
+            end
+
+          _ ->
+            {:error, "Remote path is not a directory"}
+        end
+
+      e ->
+        S.handle_error(e)
+    end
   end
 
   @doc """
@@ -74,14 +84,14 @@ defmodule SFTP.ManagementService do
   end
 
   defp remove_all_files(connection, directory) do
-     case list_files(connection, directory) do
-      {:ok, filenames} -> Enum.map(filenames, remove_file(connection, &(&1)))
+    case list_files(connection, directory) do
+      {:ok, filenames} -> Enum.map(filenames, remove_file(connection, & &1))
       e -> S.handle_error(e)
-     end
+    end
   end
 
   def truncate_file(connection, remote_path, bytes) do
-   #TODO
-   [connection, remote_path, bytes]
+    # TODO
+    [connection, remote_path, bytes]
   end
 end

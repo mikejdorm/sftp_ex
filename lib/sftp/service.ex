@@ -16,7 +16,7 @@ defmodule SFTP.Service do
   end
 
   def read_file_info(connection, remote_path) do
-   :ssh_sftp.read_file_info(connection.channel_pid, remote_path)
+    :ssh_sftp.read_file_info(connection.channel_pid, remote_path)
   end
 
   def list_dir(connection, remote_path) do
@@ -36,11 +36,11 @@ defmodule SFTP.Service do
   end
 
   def close(connection, handle) do
-    :ssh_sftp.close(connection.channel_pid,handle)
+    :ssh_sftp.close(connection.channel_pid, handle)
   end
 
   def open(connection, remote_path, mode) do
-   :ssh_sftp.open(connection.channel_pid, remote_path, mode)
+    :ssh_sftp.open(connection.channel_pid, remote_path, mode)
   end
 
   def open_directory(connection, remote_path) do
@@ -52,7 +52,7 @@ defmodule SFTP.Service do
   end
 
   def write(connection, handle, data) do
-     :ssh_sftp.write(connection.channel_pid, handle, data)
+    :ssh_sftp.write(connection.channel_pid, handle, data)
   end
 
   def write_file(connection, remote_path, data) do
