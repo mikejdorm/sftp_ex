@@ -1,7 +1,9 @@
 defmodule SFTP.ServiceMock do
   @moduledoc false
 
-  def binary_data do <<131,104,3,100,0,1,97,100,0,1,98,100,0,1,99>> end
+  def binary_data do
+    <<131, 104, 3, 100, 0, 1, 97, 100, 0, 1, 98, 100, 0, 1, 99>>
+  end
 
   def start_channel(_host, _port, _opts) do
     {:ok, self(), self()}
@@ -22,24 +24,28 @@ defmodule SFTP.ServiceMock do
   end
 
   def read_file_info(_connection, remote_path) do
-    IO.puts "Remote Path: #{remote_path}"
+    IO.puts("Remote Path: #{remote_path}")
+
     cond do
-       remote_path == "test/data/test_file.txt" ->
-            :file.read_file_info("test/data/test_file.txt")
-       remote_path == "test/data" ->
-            :file.read_file_info("test/data")
-      true -> {:error, "No Such Path"}
+      remote_path == "test/data/test_file.txt" ->
+        :file.read_file_info("test/data/test_file.txt")
+
+      remote_path == "test/data" ->
+        :file.read_file_info("test/data")
+
+      true ->
+        {:error, "No Such Path"}
     end
   end
 
   def list_dir(_connection, _remote_path) do
-    {:ok, ["test/data/test_file.txt","test/data/test_file.txt"]}
+    {:ok, ["test/data/test_file.txt", "test/data/test_file.txt"]}
   end
 
   def delete(_connection, file) do
     cond do
-       file == "test/test_file.txt" -> :ok
-       true -> {:error, "Error deleting file"}
+      file == "test/test_file.txt" -> :ok
+      true -> {:error, "Error deleting file"}
     end
   end
 
@@ -59,9 +65,9 @@ defmodule SFTP.ServiceMock do
 
   def close(_connection, handle) do
     cond do
-       handle == "test/data/test_file.txt" -> :ok
-       handle == "test/data" -> :ok
-       true -> {:error, "Error closing file"}
+      handle == "test/data/test_file.txt" -> :ok
+      handle == "test/data" -> :ok
+      true -> {:error, "Error closing file"}
     end
   end
 
@@ -73,10 +79,11 @@ defmodule SFTP.ServiceMock do
   end
 
   def open_directory(_connection, remote_path) do
-    IO.puts "Matching on remote_path #{remote_path}"
+    IO.puts("Matching on remote_path #{remote_path}")
+
     cond do
-     remote_path == "test/data" -> {:ok, :erlang.binary_to_term(binary_data())}
-     true -> {:error, "No Such Directory"}
+      remote_path == "test/data" -> {:ok, :erlang.binary_to_term(binary_data())}
+      true -> {:error, "No Such Directory"}
     end
   end
 
