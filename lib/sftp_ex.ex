@@ -61,7 +61,7 @@ defmodule SftpEx do
   def connect(opts) do
     opts = @default_opts |> Keyword.merge(opts)
     own_keys = [:host, :port]
-    ssh_opts = opts |> Enum.filter(fn {k, _} -> k not in own_keys end)
+    ssh_opts = opts |> Enum.filter(fn({k,_})-> not (k in own_keys) end)
     ConnectionService.connect(opts[:host], opts[:port], ssh_opts)
   end
 
