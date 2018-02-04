@@ -27,7 +27,7 @@ defmodule SFTP.Stream do
       end
     end
 
-    defp into(handle, stream) do
+    defp into(handle, stream = %FtpStream{connection: connection, path: path}) do
       fn
         :ok, {:cont, x} ->
           TransferSvc.write(connection, handle, x)
@@ -48,8 +48,8 @@ defmodule SFTP.Stream do
           {:ok, handle} -> %{stream | handle: handle}
         end
       end
-      next_function = &TransferSvc.each_binstream
-      close_function = &AccessSvc.close
+      next_function = &TransferSvc.each_binstream(&1)
+      close_function = &AccessSvc.close(&1)
       Stream.resource(start_function, next_function, close_function).(acc, fun)
     end
 
