@@ -27,10 +27,13 @@ defmodule SFTP.ManagementService do
    Returns :ok, or {:error, reason}
   """
   def remove_directory(connection, directory) do
-    remove_all_files(connection, directory)
+    case remove_all_files(connection, directory) do
+      :ok ->
+        case @sftp.delete_directory(connection, directory) do
+          :ok -> :ok
+          {:error, reason} -> {:error, reason}
+        end
 
-    case @sftp.delete_directory(connection, directory) do
-      :ok -> :ok
       {:error, reason} -> {:error, reason}
     end
   end
@@ -60,18 +63,17 @@ defmodule SFTP.ManagementService do
           :directory ->
             case @sftp.list_dir(connection, remote_path) do
               {:ok, file_list} ->
-                Enum.filter(file_list, fn file_name -> file_name != '.' && file_name != '..' end)
+                {:ok,
+                 Enum.filter(file_list, fn file_name -> file_name != '.' && file_name != '..' end)}
 
-              e ->
-                S.handle_error(e)
+              e -> e
             end
 
           _ ->
             {:error, "Remote path is not a directory"}
         end
 
-      e ->
-        S.handle_error(e)
+      e -> e
     end
   end
 
@@ -85,8 +87,14 @@ defmodule SFTP.ManagementService do
 
   defp remove_all_files(connection, directory) do
     case list_files(connection, directory) do
-      {:ok, filenames} -> Enum.map(filenames, remove_file(connection, & &1))
-      e -> S.handle_error(e)
+      {:ok, filenames} ->
+        with :ok <- Enum.each(filenames, &remove_file(connection, "#{directory}/#{&1}")) do
+          :ok
+        else
+          e -> e
+        end
+
+      {:error, reason} -> {:error, reason}
     end
   end
 
