@@ -44,7 +44,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:sftp_ex, "~> 0.2.1"}]
+      [{:sftp_ex, "~> 0.2.6"}]
     end
     ```
 
