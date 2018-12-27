@@ -72,8 +72,19 @@ defmodule SFTP.TransferService do
 
   defp download_directory(connection, remote_path) do
     case @sftp.list_dir(connection, remote_path) do
-      {:ok, filenames} -> Enum.map(filenames, &download_file(connection, &1))
-      e -> S.handle_error(e)
+      {:ok, filenames} ->
+        Enum.map(filenames, &download_file(connection, build_file_path(&1, remote_path)))
+
+      e ->
+        S.handle_error(e)
     end
+  end
+
+  defp build_file_path(filename, dir_path) when is_list(dir_path) do
+    dir_path ++ '/' ++ filename
+  end
+
+  defp build_file_path(filename, dir_path) when is_binary(dir_path) do
+    dir_path <> "/" <> to_string(filename)
   end
 end
