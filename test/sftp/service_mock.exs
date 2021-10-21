@@ -39,7 +39,7 @@ defmodule SFTP.ServiceMock do
   end
 
   def list_dir(_connection, _remote_path) do
-    {:ok, ["test/data/test_file.txt", "test/data/test_file.txt"]}
+    {:ok, ["test_file.txt"]}
   end
 
   def delete(_connection, file) do
@@ -51,7 +51,7 @@ defmodule SFTP.ServiceMock do
 
   def delete_directory(_connection, file) do
     cond do
-      file == "test/testdir" -> :ok
+      file == "test/data" -> :ok
       true -> {:error, "Error deleting directory"}
     end
   end

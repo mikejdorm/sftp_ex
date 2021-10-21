@@ -13,11 +13,11 @@ defmodule SFTP.ManagementServiceTest do
   end
 
   test "remove directory" do
-    assert :ok == ManagementService.remove_directory(@test_connection, "test/testdir")
+    assert :ok == ManagementService.remove_directory(@test_connection, "test/data")
   end
 
   test "remove non-existent directory" do
-    assert {:error, "Error deleting directory"} ==
+    assert {:error, "No Such Path"} ==
              ManagementService.remove_directory(@test_connection, "baddir")
   end
 
