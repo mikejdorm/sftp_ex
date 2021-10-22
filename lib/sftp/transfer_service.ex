@@ -25,6 +25,10 @@ defmodule SFTP.TransferService do
     end
   end
 
+  def each_binstream(%SFTP.Stream{connection: connection, handle: handle, byte_length: byte_length}) do
+     each_binstream(connection, handle, byte_length)
+  end
+
   @doc """
     Writes data to a open file using the channel PID
   """

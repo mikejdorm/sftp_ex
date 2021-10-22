@@ -17,6 +17,10 @@ defmodule SFTP.AccessService do
     end
   end
 
+  def close(%SFTP.Stream{connection: connection, handle: handle}) do
+    close(connection, handle)
+  end
+
   @doc """
   Returns {:ok, File.Stat}, or {:error, reason}
   """
