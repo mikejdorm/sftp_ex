@@ -17,3 +17,7 @@ erl_crash.dump
 *.ez
 
 .idea*
+
+.elixir-ls
+
+.asdf
