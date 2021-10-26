@@ -5,7 +5,7 @@ defmodule SftpEx.Sftp.Access do
 
   require SftpEx.Logger, as: Logger
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Types, as: T
 
   @sftp Application.get_env(:sftp_ex, :sftp_service, SftpEx.Erl.Sftp)
@@ -15,13 +15,11 @@ defmodule SftpEx.Sftp.Access do
   Returns :ok, or {:error, reason}
   """
 
-  @spec close(Conn.t(), T.handle(), T.either_string(), timeout) ::
+  @spec close(Conn.t(), T.handle(), timeout) ::
           :ok | {:error, atom()}
 
-  def close(_, _, _path \\ '', timeout \\ Conn.timeout())
-
-  def close(%Conn{} = conn, handle, _path, timeout) do
-    case @sftp.close(conn, T.charlist(handle), timeout) do
+  def close(%Conn{} = conn, handle, timeout \\ Conn.timeout()) do
+    case @sftp.close(conn, handle, timeout) do
       :ok -> :ok
       e -> Logger.handle_error(e)
     end
@@ -31,7 +29,7 @@ defmodule SftpEx.Sftp.Access do
   Returns {:ok, File.Stat}, or {:error, reason}
   """
 
-  @spec file_info(Conn.t(), T.either_string(), timeout) ::
+  @spec file_info(Conn.t(), T.either_string() | T.handle(), timeout) ::
           {:ok, File.Stat.t()} | {:error, atom()}
 
   def file_info(%Conn{} = conn, remote_path, timeout \\ Conn.timeout()) do
@@ -68,7 +66,7 @@ defmodule SftpEx.Sftp.Access do
   """
 
   @spec open_file(Conn.t(), T.either_string(), T.mode(), timeout) ::
-          {:ok, binary} | T.error_tuple()
+          {:ok, T.handle()} | T.error_tuple()
 
   def open_file(%Conn{} = conn, remote_path, mode, timeout \\ Conn.timeout()) do
     @sftp.open(conn, T.charlist(remote_path), mode, timeout)

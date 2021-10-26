@@ -25,7 +25,7 @@ defmodule SftpEx.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
-    [extra_applications: [:logger, :ssh, :public_key, :crypto, :mox]]
+    [extra_applications: [:logger, :ssh, :public_key, :crypto]]
   end
 
   defp deps do

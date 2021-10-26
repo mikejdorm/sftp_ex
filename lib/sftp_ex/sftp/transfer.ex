@@ -5,7 +5,7 @@ defmodule SftpEx.Sftp.Transfer do
 
   require SftpEx.Logger, as: Logger
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Types, as: T
 
   @sftp Application.get_env(:sftp_ex, :sftp_service, SftpEx.Erl.Sftp)
@@ -50,10 +50,10 @@ defmodule SftpEx.Sftp.Transfer do
     Writes a file to a remote path given a file, remote path, and connection.
   """
 
-  @spec upload(Conn.t(), T.either_string(), T.handle(), timeout()) :: :ok | T.error_tuple()
+  @spec upload(Conn.t(), T.either_string(), T.data(), timeout()) :: :ok | T.error_tuple()
 
-  def upload(%Conn{} = conn, remote_path, file_handle, timeout \\ Conn.timeout()) do
-    case @sftp.write_file(conn, T.charlist(remote_path), file_handle, timeout) do
+  def upload(%Conn{} = conn, remote_path, data, timeout \\ Conn.timeout()) do
+    case @sftp.write_file(conn, T.charlist(remote_path), data, timeout) do
       :ok -> :ok
       e -> Logger.handle_error(e)
     end
@@ -75,7 +75,7 @@ defmodule SftpEx.Sftp.Transfer do
         case File.Stat.from_record(file_stat).type do
           :directory -> download_directory(conn, remote_path, timeout)
           :regular -> download_file(conn, remote_path, timeout)
-          _ -> {:error, "Unsupported Operation"}
+          not_dir_or_file -> {:error, "Unsupported type: #{inspect(not_dir_or_file)}"}
         end
 
       e ->

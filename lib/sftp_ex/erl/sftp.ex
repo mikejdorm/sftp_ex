@@ -3,7 +3,7 @@ defmodule SftpEx.Erl.Sftp do
   A wrapper around the Erlang SFTP library
   "
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Types, as: T
 
   @spec start_channel(T.host(), T.port_number(), list) ::
@@ -28,7 +28,7 @@ defmodule SftpEx.Erl.Sftp do
   @spec read_file_info(Conn.t(), charlist, timeout) :: {:ok, T.file_info()} | T.error_tuple()
 
   def read_file_info(%Conn{} = conn, remote_path, timeout \\ Conn.timeout()) do
-    :ssh_sftp.read_file_info(conn.channel_pid, remote_path, timeout) |> IO.inspect()
+    :ssh_sftp.read_file_info(conn.channel_pid, remote_path, timeout)
   end
 
   @spec list_dir(Conn.t(), charlist, timeout) :: {:ok, [charlist]} | T.error_tuple()
@@ -61,7 +61,7 @@ defmodule SftpEx.Erl.Sftp do
     :ssh_sftp.close(conn.channel_pid, handle, timeout)
   end
 
-  @spec open(Conn.t(), list, atom, timeout) :: {:ok, binary} | T.error_tuple()
+  @spec open(Conn.t(), list, T.mode(), timeout) :: {:ok, T.handle()} | T.error_tuple()
 
   def open(%Conn{} = conn, remote_path, mode, timeout \\ Conn.timeout()) do
     :ssh_sftp.open(conn.channel_pid, remote_path, mode, timeout)
@@ -96,5 +96,25 @@ defmodule SftpEx.Erl.Sftp do
 
   def read_file(%Conn{} = conn, remote_path, timeout \\ Conn.timeout()) do
     :ssh_sftp.read_file(conn.channel_pid, remote_path, timeout)
+  end
+
+  @spec position(Conn.t(), T.handle(), T.location(), timeout) ::
+          {:ok, non_neg_integer()} | T.error_tuple()
+
+  def position(%Conn{} = conn, handle, location, timeout \\ Conn.timeout()) do
+    :ssh_sftp.position(conn.channel_pid, handle, location, timeout)
+  end
+
+  @spec pread(Conn.t(), T.handle(), non_neg_integer(), non_neg_integer(), timeout) ::
+          {:ok, T.data()} | :eof | T.error_tuple()
+
+  def pread(%Conn{} = conn, handle, position, length, timeout \\ Conn.timeout()) do
+    :ssh_sftp.pread(conn.channel_pid, handle, position, length, timeout)
+  end
+
+  @spec pwrite(Conn.t(), T.handle(), non_neg_integer(), T.data(), timeout) :: :ok | T.error_tuple()
+
+  def pwrite(%Conn{} = conn, handle, position, data, timeout \\ Conn.timeout()) do
+    :ssh_sftp.pwrite(conn.channel_pid, handle, position, data, timeout)
   end
 end

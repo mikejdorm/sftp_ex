@@ -4,7 +4,7 @@ defmodule SftpEx.ConnTest do
 
   import Mox
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
 
   @host "testhost"
   @port 22

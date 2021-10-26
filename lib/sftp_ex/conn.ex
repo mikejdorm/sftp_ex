@@ -1,6 +1,8 @@
-defmodule SftpEx.Conn do
+defmodule SFTP.Connection do
   @moduledoc """
     Provides methods related to starting and stopping an SFTP connection
+
+    Atypical naming to maintain backwards compatibility
   """
 
   require SftpEx.Logger, as: Logger
@@ -9,6 +11,13 @@ defmodule SftpEx.Conn do
 
   @ssh Application.get_env(:sftp_ex, :ssh_service, SftpEx.Ssh)
   @sftp Application.get_env(:sftp_ex, :sftp_service, SftpEx.Erl.Sftp)
+
+  @host Application.get_env(:sftp_ex, :host)
+  @port Application.get_env(:sftp_ex, :port, 22)
+  @opts [
+    user: Application.get_env(:sftp_ex, :user),
+    key_cb: SftpEx.KeyProvider
+  ]
 
   defstruct channel_pid: nil, connection_ref: nil, host: nil, port: 22, opts: []
 
@@ -30,7 +39,7 @@ defmodule SftpEx.Conn do
 
   @spec new(pid, :ssh.connection_ref(), T.host(), T.port_number(), list) :: C.t()
 
-  def new(channel_pid, connection_ref, host, port, opts) do
+  def new(channel_pid, connection_ref, host \\ @host, port \\ @port, opts \\ @opts) do
     %__MODULE__{
       channel_pid: channel_pid,
       connection_ref: connection_ref,
@@ -68,7 +77,7 @@ defmodule SftpEx.Conn do
         {:ok, new(channel_pid, connection_ref, host, port, opts)}
 
       e ->
-        Logger.handle_error([__MODULE__, :connect], e)
+        Logger.handle_error(e, [__MODULE__, :connect])
     end
   end
 end

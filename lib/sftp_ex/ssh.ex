@@ -5,15 +5,8 @@ defmodule SftpEx.Ssh do
 
   require SftpEx.Logger, as: Logger
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Types, as: T
-
-  defmodule Behaviour do
-    @moduledoc false
-    # a contract for ssh to fufil, for Mox
-    @callback start() :: :ok | {:error, any()}
-    @callback close_connection(Conn.t()) :: :ok | {:error, any()}
-  end
 
   @spec start :: :ok | T.error_tuple()
   def start do

@@ -3,7 +3,7 @@ defmodule SftpEx.Sftp.Stream do
   A stream to download/upload a file from a server through SFTP
   "
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Sftp.Access
   alias SftpEx.Sftp.Stream
   alias SftpEx.Sftp.Transfer
@@ -26,8 +26,8 @@ defmodule SftpEx.Sftp.Stream do
     @spec into(Stream.t()) :: none
     def into(%Stream{conn: conn, path: path, byte_length: _byte_length} = stream) do
       case Access.open_file(conn, path, [:write, :binary, :creat]) do
-        {:error, reason} -> {:error, reason}
         {:ok, handle} -> {:ok, into(conn, handle, stream)}
+        {:error, reason} -> {:error, reason}
       end
     end
 
@@ -52,8 +52,8 @@ defmodule SftpEx.Sftp.Stream do
     def reduce(%Stream{conn: conn, path: path, byte_length: byte_length}, acc, fun) do
       start_function = fn ->
         case Access.open(conn, path, [:read, :binary]) do
-          {:error, reason} -> raise File.Error, reason: reason, action: "stream", path: path
           {:ok, handle} -> handle
+          {:error, reason} -> raise File.Error, reason: reason, action: "stream", path: path
         end
       end
 

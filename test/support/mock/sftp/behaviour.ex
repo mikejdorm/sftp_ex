@@ -3,7 +3,7 @@ defmodule SftpEx.Erl.Sftp.Behaviour do
   Use separate module for ease of testing
   """
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Types, as: T
 
   @callback start_channel(T.host(), T.port_number(), list) ::
@@ -37,4 +37,13 @@ defmodule SftpEx.Erl.Sftp.Behaviour do
   @callback write_file(Conn.t(), charlist, iodata, timeout) :: :ok | T.error_tuple()
 
   @callback read_file(Conn.t(), charlist, timeout) :: {:ok, T.data()} | T.error_tuple()
+
+  @callback position(Conn.t(), T.handle(), T.location(), timeout) ::
+              {:ok, non_neg_integer()} | T.error_tuple()
+
+  @callback pread(Conn.t(), T.handle(), non_neg_integer(), non_neg_integer(), timeout) ::
+              {:ok, T.data()} | :eof | T.error_tuple()
+
+  @callback pwrite(Conn.t(), T.handle(), non_neg_integer(), T.data(), timeout) ::
+              :ok | T.error_tuple()
 end

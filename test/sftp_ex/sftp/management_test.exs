@@ -4,7 +4,7 @@ defmodule SftpEx.Sftp.ManagementTest do
 
   import Mox
 
-  alias SftpEx.Conn
+  alias SFTP.Connection, as: Conn
   alias SftpEx.Sftp.Management
   alias SftpEx.Types, as: T
 
@@ -111,5 +111,29 @@ defmodule SftpEx.Sftp.ManagementTest do
 
     assert {:error, "File not found"} ==
              Management.rename(@test_connection, "bad-file.txt", "bad-file2.txt")
+  end
+
+  test "append to existing file" do
+    Mock.SftpEx.Erl.Sftp
+    |> expect(:read_file_info, fn _conn, 'test/data/test_file.txt', _timeout ->
+      {:ok, T.new_file_info(size: 100, type: :regular)}
+    end)
+
+    Mock.SftpEx.Erl.Sftp
+    |> expect(:open, fn _conn, 'test/data/test_file.txt', [:append], _timeout ->
+      {:ok, {:a, :b, :c}}
+    end)
+
+    Mock.SftpEx.Erl.Sftp
+    |> expect(:pwrite, fn _conn, {:a, :b, :c}, 100, "what up", _timeout ->
+      :ok
+    end)
+
+    Mock.SftpEx.Erl.Sftp
+    |> expect(:stop_channel, fn _conn ->
+      :ok
+    end)
+
+    assert :ok == Management.append_file(@test_connection, "test/data/test_file.txt", "what up")
   end
 end
