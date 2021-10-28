@@ -28,6 +28,3 @@ config :logger, level: :info
 # here (which is why it is important to import them last).
 #
 import_config "#{Mix.env()}.exs"
-
-# config :sftp_ex, :ssh_service, SSH.ServiceMock
-# config :sftp_ex, :sftp_service, SFTP.ServiceMock

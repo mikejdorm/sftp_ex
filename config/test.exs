@@ -1,12 +1,10 @@
 use Mix.Config
 
-Code.compiler_options(ignore_module_conflict: true)
+config :sftp_ex, :ssh_service, Mock.SftpEx.Ssh
+config :sftp_ex, :sftp_service, Mock.SftpEx.Erl.Sftp
 
-Path.wildcard("test/sftp/*mock*")
-|> Enum.each(&Code.require_file("../#{&1}", __DIR__))
+config :sftp_ex, :host, "host"
+config :sftp_ex, :port, 22
+config :sftp_ex, :user, "user"
 
-Path.wildcard("test/ssh/*mock*")
-|> Enum.each(&Code.require_file("../#{&1}", __DIR__))
-
-config :sftp_ex, :ssh_service, SSH.ServiceMock
-config :sftp_ex, :sftp_service, SFTP.ServiceMock
+config :sftp_ex, :cert, "fake"

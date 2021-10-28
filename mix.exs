@@ -4,8 +4,9 @@ defmodule SftpEx.Mixfile do
   def project do
     [
       app: :sftp_ex,
-      version: "0.2.6",
-      elixir: ">= 1.3.0",
+      version: "0.3.0",
+      elixir: ">= 1.10.0",
+      elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -19,12 +20,19 @@ defmodule SftpEx.Mixfile do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["test/support", "lib"]
+  defp elixirc_paths(_), do: ["lib"]
+
   def application do
-    [applications: [:logger, :ssh, :public_key, :crypto]]
+    [extra_applications: [:logger, :ssh, :public_key, :crypto]]
   end
 
   defp deps do
-    [{:mock, "~> 0.2.0", only: :test}, {:ex_doc, "~> 0.14", only: :dev}]
+    [
+      {:mox, "~> 1.0.1", only: :test},
+      {:ex_doc, "~> 0.14", only: :dev}
+    ]
   end
 
   defp package do
