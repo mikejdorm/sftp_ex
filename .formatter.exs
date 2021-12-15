@@ -1,11 +1,4 @@
+# Used by "mix format"
 [
-  import_deps: [],
-  inputs: [
-    "{mix,.formatter}.exs",
-    "config/*.exs",
-    "lib/mix/**/*.{ex,exs}",
-    "lib/**/*.{ex,exs}",
-    "test/**/*.{ex,exs}"
-  ],
-  line_length: 100
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
